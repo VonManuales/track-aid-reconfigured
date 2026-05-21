@@ -11,16 +11,16 @@ import {
 import { applyDemoCoverageOverrides } from "../lib/demoCoverage";
 
 export default async function Dashboard() {
-  const [grants, poorestList, dbmBudget] = await Promise.all([
+  const [grants, poorestList, dbmBudget] = await Promise.all<[any[], any[], any]>([
     getActivePovertyGrants(),
     getPoorestProvinces(),
     getNationalSubsidies()
   ]);
 
   // Process provincial aid matching and detection
-  const provinceStats = poorestList.map(p => {
+  const provinceStats = poorestList.map((p: any) => {
     const provinceAid = grants
-      .filter(g => g.provinces.some(prov => {
+      .filter((g: any) => g.provinces.some((prov: any) => {
         const pName = p.name.toLowerCase();
         const pReg = p.region.toLowerCase();
         const iatiLoc = prov.toLowerCase();
