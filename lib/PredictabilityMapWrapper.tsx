@@ -2,15 +2,13 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import { FOCUS_REGION_LABEL } from './regionViii';
 
-// Dynamically import the Leaflet component with SSR disabled.
-// This wrapper renders the same placeholder on server and first client render,
-// avoiding a hydration mismatch before the actual map is mounted.
 const Map = dynamic(() => import('./PredictabilityMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full bg-gray-900 animate-pulse flex items-center justify-center text-gray-500">
-      Initializing Geospatial Engine...
+    <div className="flex h-full w-full items-center justify-center bg-[#e8eef4] text-sky-700/70">
+      Loading Eastern Visayas map…
     </div>
   ),
 });
@@ -27,14 +25,27 @@ export default function PredictabilityMapWrapper({ provinces }: MapWrapperProps)
   }, []);
 
   return (
-    <div className="w-full h-[450px] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl relative">
+    <div className="relative h-[540px] w-full overflow-hidden rounded-2xl border border-sky-200/90 bg-[#e8eef4] shadow-xl shadow-sky-200/50 ring-1 ring-sky-300/40">
       {mounted ? (
         <Map provinces={provinces} />
       ) : (
-        <div className="w-full h-full bg-gray-900 animate-pulse flex items-center justify-center text-gray-500">
-          Initializing Geospatial Engine...
+        <div className="flex h-full w-full items-center justify-center bg-[#e8eef4] text-sky-700/70">
+          Loading Eastern Visayas map…
         </div>
       )}
+
+      {/* Soft sky/emerald wash over the visible region only */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-sky-100/25 via-transparent to-emerald-100/20"
+        aria-hidden
+      />
+
+      <div className="absolute left-3 top-3 z-[1000] rounded-lg border border-sky-200 bg-white/95 px-3 py-1.5 shadow-md backdrop-blur-sm">
+        <span className="block text-[10px] font-bold uppercase tracking-widest text-teal-700">
+          {FOCUS_REGION_LABEL}
+        </span>
+        <span className="text-[9px] text-slate-500">Locked to Eastern Visayas · surrounding areas visible</span>
+      </div>
     </div>
   );
 }

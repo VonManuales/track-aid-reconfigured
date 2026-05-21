@@ -10,18 +10,14 @@ export function isDemoCoverageEnabled(): boolean {
   return process.env.ENABLE_DEMO_COVERAGE !== 'false';
 }
 
-/** Target coverage % for select provinces (illustrates all five tier colors). */
+/** Region VIII demo targets — one sample per coverage tier across six provinces. */
 export const DEMO_COVERAGE_BY_PROVINCE: Record<string, number> = {
-  Apayao: 18,
-  'Eastern Samar': 38,
-  'Maguindanao del Sur': 62,
-  'Zamboanga del Norte': 88,
-  'Lanao del Sur': 115,
-  Sarangani: 22,
-  Sulu: 45,
-  Basilan: 68,
-  'Agusan del Sur': 92,
-  'Northern Samar': 108,
+  'Eastern Samar': 18,
+  Samar: 38,
+  'Northern Samar': 62,
+  Leyte: 88,
+  'Southern Leyte': 115,
+  Biliran: 45,
 };
 
 export function resourcesForCoverage(incidence: number, coveragePercent: number): number {
@@ -63,11 +59,10 @@ export function applyDemoCoverageOverrides<T extends ProvinceWithCoverage>(stats
   });
 }
 
-/** Province names assigned to each tier (for reference / tests). */
 export const DEMO_TIER_SAMPLES: Record<CoverageTierId, string> = {
-  critical: 'Apayao',
-  low: 'Eastern Samar',
-  moderate: 'Maguindanao del Sur',
-  good: 'Zamboanga del Norte',
-  covered: 'Lanao del Sur',
+  critical: 'Eastern Samar',
+  low: 'Samar',
+  moderate: 'Northern Samar',
+  good: 'Leyte',
+  covered: 'Southern Leyte',
 };

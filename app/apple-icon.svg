@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="TrackAid">
+  <rect width="180" height="180" rx="40" fill="#059669"/>
+  <path
+    d="M90 36c-20 0-36 16-36 35.5 0 27 36 68.5 36 68.5s36-41.5 36-68.5C126 52 110 36 90 36z"
+    fill="#ecfdf5"
+  />
+  <circle cx="90" cy="72" r="14" fill="#059669"/>
+  <path
+    d="M54 126h72"
+    stroke="#34d399"
+    stroke-width="9"
+    stroke-linecap="round"
+  />
+</svg>

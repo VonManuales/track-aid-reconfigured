@@ -25,7 +25,29 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000), or use the official-style local URL below.
+
+### Official-style local URL (instead of localhost)
+
+1. Edit `C:\Windows\System32\drivers\etc\hosts` as Administrator and add:
+   ```
+   127.0.0.1 trackaid.local
+   ```
+2. Run:
+   ```bash
+   npm run dev:local
+   ```
+3. Open [http://trackaid.local:3000](http://trackaid.local:3000) — same app, more professional address bar than `localhost`.
+
+### Production URL (real official website)
+
+Deploy to [Vercel](https://vercel.com) (or similar), then set in `.env.local` / host settings:
+
+```bash
+NEXT_PUBLIC_SITE_URL=https://your-project.vercel.app
+```
+
+You can later attach a custom domain (e.g. `trackaid.ph`) in Vercel → **Settings → Domains**. The browser will then show that domain instead of `localhost:3000`.
 
 ### Environment variables
 
@@ -33,6 +55,7 @@ Open [http://localhost:3000](http://localhost:3000).
 |----------|----------|-------------|
 | `IATI_API_KEY` | No | IATI Datastore subscription key. The app runs without it but may hit rate limits. |
 | `ENABLE_DEMO_COVERAGE` | No | Set to `false` to use only calculated coverage (no illustrative tier samples on the top 10 provinces). Default: enabled. |
+| `NEXT_PUBLIC_SITE_URL` | No | Canonical public URL after deploy (metadata, sharing). |
 
 Never commit `.env.local` or real API keys to GitHub.
 
@@ -41,6 +64,7 @@ Never commit `.env.local` or real API keys to GitHub.
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Start development server |
+| `npm run dev:local` | Dev server at `http://trackaid.local:3000` (requires hosts file entry) |
 | `npm run build` | Production build |
 | `npm run start` | Run production server |
 | `npm run lint` | Run ESLint |

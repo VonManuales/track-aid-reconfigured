@@ -9,6 +9,7 @@ import {
   isUnderfunded,
 } from "../lib/coverageTiers";
 import { applyDemoCoverageOverrides } from "../lib/demoCoverage";
+import { FOCUS_REGION, FOCUS_REGION_LABEL, isRegionViiiProvince } from "../lib/regionViii";
 
 export default async function Dashboard() {
   const [grants, poorestList, dbmBudget] = await Promise.all<[any[], any[], any]>([
@@ -17,8 +18,10 @@ export default async function Dashboard() {
     getNationalSubsidies()
   ]);
 
-  // Process provincial aid matching and detection
-  const provinceStats = poorestList.map((p: any) => {
+  const regionViiiList = poorestList.filter((p: any) => isRegionViiiProvince(p.region));
+
+  // Process provincial aid matching and detection (Region VIII only)
+  const provinceStats = regionViiiList.map((p: any) => {
     const provinceAid = grants
       .filter((g: any) => g.provinces.some((prov: any) => {
         const pName = p.name.toLowerCase();
@@ -60,10 +63,12 @@ export default async function Dashboard() {
   // Illustrative amounts for select provinces so all coverage tiers are visible
   const provinceStatsWithDemo = applyDemoCoverageOverrides(provinceStats);
 
-  // Separate the top 10 for specific UI summary sections
-  const top10Stats = provinceStatsWithDemo.slice(0, 10);
-  const underfundedCount = top10Stats.filter(p => p.isUnderfunded).length;
-  const avgCoverage = ((top10Stats.reduce((sum, p) => sum + (p.totalResources / (p.incidence * 50000000) || 0), 0) / 10) * 100).toFixed(1);
+  const regionStats = provinceStatsWithDemo;
+  const provinceCount = regionStats.length || 1;
+  const underfundedCount = regionStats.filter(p => p.isUnderfunded).length;
+  const avgCoverage = (
+    (regionStats.reduce((sum, p) => sum + (p.coveragePercent || 0), 0) / provinceCount)
+  ).toFixed(1);
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-gray-200 font-sans">
@@ -72,9 +77,10 @@ export default async function Dashboard() {
         <div>
           <div className="text-xl font-bold tracking-wider text-green-500">TrackAid</div>
           <div className="text-sm text-gray-400">The Philippine Resource Mobilization Tracker</div>
+          <div className="mt-1 text-xs text-cyan-500/90">{FOCUS_REGION_LABEL}</div>
         </div>
         <nav className="hidden text-sm text-gray-400 md:block">
-          A site for LGUs and NGOs to identify funding gaps and optimize aid distribution. Powered by Next.js, Leaflet, and live IATI data.
+          Eastern Visayas funding gaps for LGUs and NGOs. Powered by Next.js, Leaflet, and live IATI data.
         </nav>
       </header>
 
@@ -97,7 +103,7 @@ export default async function Dashboard() {
           </article>
 
           <article className="p-5 bg-[#020617] border border-gray-800 rounded-xl shadow-2xl">
-            <div className="mb-2 text-xs font-semibold tracking-widest text-gray-400 uppercase">Underfunded Provinces</div>
+            <div className="mb-2 text-xs font-semibold tracking-widest text-gray-400 uppercase">Underfunded ({FOCUS_REGION})</div>
             <div className="text-2xl font-bold">{underfundedCount}</div>
             <span className="inline-flex items-center px-2 py-1 mt-2 text-[10px] font-bold tracking-widest text-red-300 uppercase bg-red-900/30 rounded-full">
               Funding gap detected
@@ -109,7 +115,7 @@ export default async function Dashboard() {
         <section id="resource-map" className="mt-8 scroll-mt-24">
           <h2 className="mb-2 text-lg font-semibold">Resource Distribution Heatmap</h2>
           <p className="mb-4 text-sm text-gray-400">
-            Regional aggregate view. Zoom in for provinces, or click a province name below to fly to it on the map.
+            {FOCUS_REGION_LABEL}. Click a province name below to fly to it on the map.
           </p>
           
           {/* Interactive Map with dynamic search engine */}
@@ -121,8 +127,8 @@ export default async function Dashboard() {
         <section className="mt-8">
           <h2 className="mb-2 text-lg font-semibold">Predictability breakdown</h2>
           <p className="mb-3 text-xs text-gray-500">Click a province name to locate it on the map.</p>
-          <div className="grid grid-cols-2 gap-4 p-6 border border-gray-800 rounded-2xl bg-[#020617] md:grid-cols-5">
-            {top10Stats.map((p) => (
+          <div className="grid grid-cols-2 gap-4 p-6 border border-gray-800 rounded-2xl bg-[#020617] sm:grid-cols-3">
+            {regionStats.map((p) => (
               <div
                 key={p.name}
                 className={`flex flex-col p-3 rounded-lg bg-gray-900/20 border ${p.tier.borderClass}`}
@@ -168,7 +174,7 @@ export default async function Dashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800">
-                {top10Stats.map((p) => (
+                {regionStats.map((p) => (
                   <tr key={p.name} className="transition-colors hover:bg-gray-900/50">
                     <td className="px-4 py-3 font-medium">
                       <ProvinceMapLink name={p.name}>{p.name}</ProvinceMapLink>

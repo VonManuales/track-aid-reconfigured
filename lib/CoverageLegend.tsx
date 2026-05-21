@@ -3,7 +3,7 @@ import { COVERAGE_TIERS } from './coverageTiers';
 export default function CoverageLegend() {
   return (
     <div
-      className="mt-3 rounded-xl border border-gray-800 bg-[#020617]/90 px-4 py-3"
+      className="mt-3 rounded-xl border border-sky-900/40 bg-[#020617]/90 px-4 py-3"
       aria-label="Funding coverage color legend"
     >
       <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-gray-500">
@@ -26,7 +26,7 @@ export default function CoverageLegend() {
       </div>
       <p className="mt-2 text-[10px] text-gray-500">
         Colors reflect total resources (IATI aid + national subsidy) vs. estimated need from poverty incidence.
-        When demo mode is enabled, the ten highest-poverty provinces use illustrative coverage values to show each tier.
+        When demo mode is enabled, Region VIII provinces use illustrative coverage values to show each tier.
       </p>
     </div>
   );
