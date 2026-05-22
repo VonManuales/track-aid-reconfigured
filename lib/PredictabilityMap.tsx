@@ -11,6 +11,13 @@ import {
 import { useEffect } from 'react';
 import { getCoveragePercent, getCoverageTier, type CoverageTier } from './coverageTiers';
 import { useMapNavigation } from './MapNavigationContext';
+import { getProvinceDetailsUrl } from './provinceSlug';
+
+const AnyMapContainer = MapContainer as any;
+const AnyTileLayer = TileLayer as any;
+const AnyCircleMarker = CircleMarker as any;
+const AnyPopup = Popup as any;
+const AnyRectangle = Rectangle as any;
 import {
   FOCUS_REGION_LABEL,
   REGION_VIII_BOUNDS,
@@ -84,7 +91,7 @@ export default function PredictabilityMap({ provinces }: { provinces: Province[]
 
   return (
     <div className="relative h-full w-full bg-[#e8eef4]">
-      <MapContainer
+      <AnyMapContainer
         center={REGION_VIII_CENTER}
         zoom={REGION_VIII_DEFAULT_ZOOM}
         minZoom={REGION_VIII_MIN_ZOOM}
@@ -99,12 +106,12 @@ export default function PredictabilityMap({ provinces }: { provinces: Province[]
         <MapFlyController />
         <MapResizeFix />
 
-        <TileLayer
+        <AnyTileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
 
-        <Rectangle
+        <AnyRectangle
           bounds={REGION_VIII_BOUNDS}
           pathOptions={{
             color: '#0d9488',
@@ -122,7 +129,7 @@ export default function PredictabilityMap({ provinces }: { provinces: Province[]
           const isSelected = selectedProvince === p.name;
 
           return (
-            <CircleMarker
+            <AnyCircleMarker
               key={p.name}
               center={[p.lat, p.lng]}
               pathOptions={{
@@ -133,30 +140,27 @@ export default function PredictabilityMap({ provinces }: { provinces: Province[]
               }}
               radius={(isSelected ? 15 : 10) + p.incidence / 6}
             >
-              <Popup className="trackaid-popup">
+              <AnyPopup className="trackaid-popup">
                 <div className="text-xs text-slate-700">
-                  <strong className="mb-1 block border-b border-sky-100 pb-1 text-sm text-slate-900">
+                  <strong className="mb-2 block border-b border-sky-100 pb-1 text-sm text-slate-900">
                     {p.name}
                   </strong>
-                  <span className="text-slate-500">{FOCUS_REGION_LABEL}</span>
-                  <br />
-                  Poverty: <strong>{p.incidence}%</strong>
-                  <br />
-                  Coverage: <strong>{coverage.toFixed(0)}%</strong>
-                  <br />
-                  DBM Subsidy: ₱{(p.budget / 1000000).toFixed(1)}M
-                  <br />
-                  IATI Aid: ₱{(p.aid / 1000000).toFixed(1)}M
-                  <br />
-                  <span className="font-medium" style={{ color: tier.hex }}>
-                    {tier.label}
-                  </span>
+                  <p className="text-slate-500">{FOCUS_REGION_LABEL}</p>
+                  <p className="mt-2 text-[11px] text-slate-500">Open the province detail page for funding metrics and coverage analysis.</p>
+                  <div className="mt-3">
+                    <a
+                      href={getProvinceDetailsUrl(p.name)}
+                      className="inline-flex items-center rounded-md bg-sky-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-600"
+                    >
+                      Show details
+                    </a>
+                  </div>
                 </div>
-              </Popup>
-            </CircleMarker>
+              </AnyPopup>
+            </AnyCircleMarker>
           );
         })}
-      </MapContainer>
+      </AnyMapContainer>
     </div>
   );
 }

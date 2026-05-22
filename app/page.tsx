@@ -9,7 +9,7 @@ import {
   isUnderfunded,
 } from "../lib/coverageTiers";
 import { applyDemoCoverageOverrides } from "../lib/demoCoverage";
-import { FOCUS_REGION, FOCUS_REGION_LABEL, isRegionViiiProvince } from "../lib/regionViii";
+import { FOCUS_REGION, FOCUS_REGION_LABEL, REGION_VIII_PROVINCES } from "../lib/regionViii";
 
 export default async function Dashboard() {
   const [grants, poorestList, dbmBudget] = await Promise.all<[any[], any[], any]>([
@@ -18,7 +18,7 @@ export default async function Dashboard() {
     getNationalSubsidies()
   ]);
 
-  const regionViiiList = poorestList.filter((p: any) => isRegionViiiProvince(p.region));
+  const regionViiiList = poorestList.filter((p: any) => REGION_VIII_PROVINCES.includes(p.name));
 
   // Process provincial aid matching and detection (Region VIII only)
   const provinceStats = regionViiiList.map((p: any) => {
@@ -31,9 +31,6 @@ export default async function Dashboard() {
         // Fuzzy matching for regions (e.g., "Region VIII" matches "Eastern Visayas")
         const regionAliases: Record<string, string[]> = {
           "region viii": ["eastern visayas", "region 8", "samar"],
-          "region vii": ["central visayas", "region 7", "cebu"],
-          "barmm": ["bangsamoro", "muslim mindanao"],
-          "car": ["cordillera"]
         };
 
         return iatiLoc.includes(pName) || 
@@ -99,7 +96,7 @@ export default async function Dashboard() {
           <article className="p-5 bg-[#020617] border border-gray-800 rounded-xl shadow-2xl">
             <div className="mb-2 text-xs font-semibold tracking-widest text-gray-400 uppercase">Avg Funding Coverage</div>
             <div className="text-2xl font-bold">{avgCoverage}%</div>
-            <p className="mt-1 text-xs text-gray-500">Resources vs. Estimated Need.</p>
+            <p className="mt-1 text-xs text-gray-500">Region VIII average coverage across tracked provinces.</p>
           </article>
 
           <article className="p-5 bg-[#020617] border border-gray-800 rounded-xl shadow-2xl">
