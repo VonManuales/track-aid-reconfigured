@@ -145,12 +145,10 @@ export default function PredictabilityMap({ provinces }: { provinces: Province[]
                   <strong className="mb-2 block border-b border-sky-100 pb-1 text-sm text-slate-900">
                     {p.name}
                   </strong>
-                  <p className="text-slate-500">{FOCUS_REGION_LABEL}</p>
-                  <p className="mt-2 text-[11px] text-slate-500">Open the province detail page for funding metrics and coverage analysis.</p>
                   <div className="mt-3">
                     <a
                       href={getProvinceDetailsUrl(p.name)}
-                      className="inline-flex items-center rounded-md bg-sky-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-600"
+                      className="inline-flex items-center rounded-md bg-sky-700 px-3 py-1.5 text-xs font-semibold !text-white transition hover:bg-sky-600"
                     >
                       Show details
                     </a>

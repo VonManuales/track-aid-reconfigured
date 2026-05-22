@@ -4,6 +4,7 @@ import { applyDemoCoverageOverrides } from '../../lib/demoCoverage';
 import { getCoveragePercent, getCoverageTier, isUnderfunded } from '../../lib/coverageTiers';
 import { REGION_VIII_PROVINCES } from '../../lib/regionViii';
 import { normalizeProvinceSlug } from '../../lib/provinceSlug';
+import { isGrantAssociatedWithProvince } from '../../lib/aidFiltering';
 
 export default async function ProvinceIndexPage() {
   const [grants, poorestList, dbmBudget] = await Promise.all([
@@ -15,23 +16,7 @@ export default async function ProvinceIndexPage() {
   const regionViiiList = poorestList.filter((p: any) => REGION_VIII_PROVINCES.includes(p.name));
   const provinceStats = regionViiiList.map((p: any) => {
     const provinceAid = grants
-      .filter((g: any) =>
-        g.provinces.some((prov: any) => {
-          const pName = p.name.toLowerCase();
-          const pReg = p.region.toLowerCase();
-          const iatiLoc = prov.toLowerCase();
-
-          const regionAliases: Record<string, string[]> = {
-            'region viii': ['eastern visayas', 'region 8', 'samar'],
-          };
-
-          return (
-            iatiLoc.includes(pName) ||
-            iatiLoc.includes(pReg) ||
-            regionAliases[pReg]?.some((alias) => iatiLoc.includes(alias))
-          );
-        }),
-      )
+      .filter((g: any) => isGrantAssociatedWithProvince(g.provinces, p.name, g.title, g.description))
       .reduce((sum: number, g: any) => sum + g.amount, 0);
 
     const nationalBudget = dbmBudget[p.name] || p.incidence * 42000000;

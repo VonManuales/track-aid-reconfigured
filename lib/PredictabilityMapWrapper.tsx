@@ -39,13 +39,6 @@ export default function PredictabilityMapWrapper({ provinces }: MapWrapperProps)
         className="pointer-events-none absolute inset-0 bg-gradient-to-br from-sky-100/25 via-transparent to-emerald-100/20"
         aria-hidden
       />
-
-      <div className="absolute left-3 top-3 z-[1000] rounded-lg border border-sky-200 bg-white/95 px-3 py-1.5 shadow-md backdrop-blur-sm">
-        <span className="block text-[10px] font-bold uppercase tracking-widest text-teal-700">
-          {FOCUS_REGION_LABEL}
-        </span>
-        <span className="text-[9px] text-slate-500">Locked to Eastern Visayas · surrounding areas visible</span>
-      </div>
     </div>
   );
 }

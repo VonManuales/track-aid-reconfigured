@@ -10,6 +10,7 @@ import {
 } from "../lib/coverageTiers";
 import { applyDemoCoverageOverrides } from "../lib/demoCoverage";
 import { FOCUS_REGION, FOCUS_REGION_LABEL, REGION_VIII_PROVINCES } from "../lib/regionViii";
+import { isGrantAssociatedWithProvince } from "../lib/aidFiltering";
 
 export default async function Dashboard() {
   const [grants, poorestList, dbmBudget] = await Promise.all<[any[], any[], any]>([
@@ -23,20 +24,7 @@ export default async function Dashboard() {
   // Process provincial aid matching and detection (Region VIII only)
   const provinceStats = regionViiiList.map((p: any) => {
     const provinceAid = grants
-      .filter((g: any) => g.provinces.some((prov: any) => {
-        const pName = p.name.toLowerCase();
-        const pReg = p.region.toLowerCase();
-        const iatiLoc = prov.toLowerCase();
-        
-        // Fuzzy matching for regions (e.g., "Region VIII" matches "Eastern Visayas")
-        const regionAliases: Record<string, string[]> = {
-          "region viii": ["eastern visayas", "region 8", "samar"],
-        };
-
-        return iatiLoc.includes(pName) || 
-               iatiLoc.includes(pReg) || 
-               (regionAliases[pReg]?.some(alias => iatiLoc.includes(alias)));
-      }))
+      .filter((g: any) => isGrantAssociatedWithProvince(g.provinces, p.name, g.title, g.description))
       .reduce((sum, g) => sum + g.amount, 0);
     
     // RECONCILIATION: Combine IATI (International) + DBM (National Tax Allotment)

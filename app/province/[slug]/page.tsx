@@ -4,6 +4,7 @@ import { applyDemoCoverageOverrides } from '../../../lib/demoCoverage';
 import { getCoveragePercent, getCoverageTier, isUnderfunded } from '../../../lib/coverageTiers';
 import { REGION_VIII_PROVINCES } from '../../../lib/regionViii';
 import { normalizeProvinceSlug } from '../../../lib/provinceSlug';
+import { isGrantAssociatedWithProvince } from '../../../lib/aidFiltering';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
@@ -32,23 +33,7 @@ export default async function ProvinceDetailsPage({ params }: { params: Promise<
   const regionViiiList = poorestList.filter((p: any) => REGION_VIII_PROVINCES.includes(p.name));
   const provinceStats = regionViiiList.map((p: any) => {
     const provinceAid = grants
-      .filter((g: any) =>
-        g.provinces.some((prov: any) => {
-          const pName = p.name.toLowerCase();
-          const pReg = p.region.toLowerCase();
-          const iatiLoc = prov.toLowerCase();
-
-          const regionAliases: Record<string, string[]> = {
-            'region viii': ['eastern visayas', 'region 8', 'samar'],
-          };
-
-          return (
-            iatiLoc.includes(pName) ||
-            iatiLoc.includes(pReg) ||
-            regionAliases[pReg]?.some((alias) => iatiLoc.includes(alias))
-          );
-        }),
-      )
+      .filter((g: any) => isGrantAssociatedWithProvince(g.provinces, p.name, g.title, g.description))
       .reduce((sum: number, g: any) => sum + g.amount, 0);
 
     const nationalBudget = dbmBudget[p.name] || p.incidence * 42000000;
@@ -91,16 +76,8 @@ export default async function ProvinceDetailsPage({ params }: { params: Promise<
   };
 
   // Collect active projects that mention this province or Region VIII
-  const regionAliases = ['eastern visayas', 'region 8', 'samar'];
-  const provinceNameLower = (slugProvinceName ?? province.name).toLowerCase();
-
   const provinceProjects = grants
-    .filter((g: any) =>
-      (g.provinces || []).some((prov: any) => {
-        const n = String(prov).toLowerCase();
-        return n.includes(provinceNameLower) || regionAliases.some((a) => n.includes(a));
-      }),
-    )
+    .filter((g: any) => isGrantAssociatedWithProvince(g.provinces, slugProvinceName ?? province.name, g.title, g.description))
     .map((g: any) => ({
       id: g.id,
       title: g.title || 'Project',
@@ -189,14 +166,12 @@ export default async function ProvinceDetailsPage({ params }: { params: Promise<
             <p className="mt-3 text-sm leading-7 text-slate-300">
               This page shows the current estimated poverty incidence, total estimated resources, and local funding coverage for the selected province. The values have been aligned with the Region VIII dashboard data and include illustrative coverage adjustments for demonstration purposes.
             </p>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-slate-800 bg-[#020617]/80 p-4">
-                <p className="text-xs uppercase tracking-widest text-slate-500">Coverage Tier</p>
-                <p className="mt-2 text-lg font-semibold text-white">{province.tier.label}</p>
-              </div>
-              <div className="rounded-2xl border border-slate-800 bg-[#020617]/80 p-4">
-                <p className="text-xs uppercase tracking-widest text-slate-500">Funding Gap</p>
-                <p className="mt-2 text-lg font-semibold text-white">{province.isUnderfunded ? 'Underfunded' : 'On track'}</p>
+            <div className="mt-5">
+              <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-slate-800 bg-[#020617]/80 p-5 sm:flex-row sm:items-center">
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-slate-500">Funding Status</p>
+                  <p className="mt-2 text-xl font-semibold text-white">{province.isUnderfunded ? 'Underfunded' : 'On track'}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -206,18 +181,31 @@ export default async function ProvinceDetailsPage({ params }: { params: Promise<
           <p className="mb-4 text-sm text-gray-400">Projects mentioning this province or Region VIII from the IATI datastore.</p>
 
           {provinceProjects.length === 0 ? (
-            <div className="rounded-2xl border border-slate-800 bg-[#020617]/80 p-6 text-sm text-slate-400">No active projects found for this province.</div>
+            <div className="rounded-2xl border border-dashed border-slate-700 bg-[#020617]/40 p-10 text-center">
+              <p className="text-sm text-slate-500">No projects specifically tagged for {province.name} or Region VIII were found in the current dataset ({grants.length} total projects scanned).</p>
+            </div>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid gap-5">
               {provinceProjects.map((proj: any) => (
-                <article key={proj.id} className="rounded-2xl border border-slate-800 bg-[#020617]/95 p-4 shadow-lg">
-                  <h3 className="text-md font-semibold text-white">{proj.title}</h3>
-                  <div className="mt-1 flex items-center gap-3 text-xs text-slate-400">
-                    <span>{proj.provider}</span>
-                    <span>·</span>
-                    <span>₱{(proj.amount / 1000000).toFixed(1)}M</span>
+                <article key={proj.id} className="group rounded-2xl border border-slate-800 bg-[#020617]/95 p-5 shadow-lg transition-all hover:border-sky-500/50 hover:bg-slate-900/40">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-md font-semibold text-white group-hover:text-sky-400">{proj.title}</h3>
+                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-400">
+                        <span className="flex items-center gap-1.5 text-slate-300">
+                          <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                          {proj.provider}
+                        </span>
+                        <span>₱{(proj.amount / 1000000).toFixed(1)}M Total Value</span>
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-[10px] font-mono text-slate-500 uppercase tracking-tighter">
+                      IATI ID: {proj.id}
+                    </div>
                   </div>
-                  <p className="mt-3 text-sm text-slate-300">Provinces: {proj.provinces.join(', ')}</p>
+                  <p className="mt-4 border-t border-slate-800 pt-3 text-xs leading-relaxed text-slate-400">
+                    <strong className="text-slate-300">Scope:</strong> {proj.provinces.join(', ')}
+                  </p>
                 </article>
               ))}
             </div>
