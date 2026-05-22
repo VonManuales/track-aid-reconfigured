@@ -55,7 +55,7 @@ export default async function ProvinceIndexPage() {
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {provinceStatsWithDemo.map((province: any) => (
-            <article key={province.name} className="rounded-3xl border border-slate-800 bg-[#020617]/95 p-5 shadow-xl shadow-slate-950/10">
+            <article key={province.name} className={`rounded-3xl border ${province.tier.borderClass} bg-[#020617]/95 p-5 shadow-xl shadow-slate-950/10 transition-colors`}>
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h2 className="text-lg font-semibold text-white">{province.name}</h2>

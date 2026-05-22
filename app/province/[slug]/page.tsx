@@ -118,7 +118,10 @@ export default async function ProvinceDetailsPage({ params }: { params: Promise<
       <header className="sticky top-0 z-[1001] border-b border-gray-800 bg-[#020617] px-6 py-4 shadow-xl">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-xl font-bold tracking-wider text-green-500">TrackAid</div>
+            <div className="flex items-center gap-2.5">
+              <img src="/icon.svg" alt="TrackAid Logo" className="w-7 h-7" />
+              <div className="text-xl font-bold tracking-wider text-green-500">TrackAid</div>
+            </div>
             <div className="text-sm text-gray-400">Province details for {province.name}</div>
           </div>
           <Link
@@ -164,16 +167,14 @@ export default async function ProvinceDetailsPage({ params }: { params: Promise<
           <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
             <h2 className="text-sm font-semibold uppercase tracking-widest text-slate-400">Summary</h2>
             <p className="mt-3 text-sm leading-7 text-slate-300">
-              This page shows the current estimated poverty incidence, total estimated resources, and local funding coverage for the selected province. The values have been aligned with the Region VIII dashboard data and include illustrative coverage adjustments for demonstration purposes.
+              {province.name} currently faces a poverty incidence of <span className="font-semibold text-white">{province.incidence}%</span>. 
+              The province is supported by <span className="font-semibold text-white">₱{(province.totalResources / 1000000).toFixed(1)}M</span> in total resources, 
+              comprised of <span className="font-semibold text-white">₱{(province.budget / 1000000).toFixed(1)}M</span> from national DBM subsidies and 
+              <span className="font-semibold text-white"> ₱{(province.aid / 1000000).toFixed(1)}M</span> in international aid. 
+              This results in a <span className={`font-semibold ${province.tier.textClass}`}>{province.coveragePercent.toFixed(0)}% resource coverage</span>, 
+              categorizing the province&apos;s funding status as <span className={`font-bold ${province.tier.textClass}`}>{province.tier.label}</span>. 
+              Currently, there are <span className="font-semibold text-white">{provinceProjects.length} active projects</span> tracking resources for this area.
             </p>
-            <div className="mt-5">
-              <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-slate-800 bg-[#020617]/80 p-5 sm:flex-row sm:items-center">
-                <div>
-                  <p className="text-xs uppercase tracking-widest text-slate-500">Funding Status</p>
-                  <p className="mt-2 text-xl font-semibold text-white">{province.isUnderfunded ? 'Underfunded' : 'On track'}</p>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
         <section className="mt-8">

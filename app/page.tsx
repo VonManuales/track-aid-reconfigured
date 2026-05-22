@@ -60,7 +60,10 @@ export default async function Dashboard() {
       {/* Header */}
       <header className="sticky top-0 z-[1001] flex items-center justify-between px-8 py-4 bg-[#020617] border-b border-gray-800 shadow-xl">
         <div>
-          <div className="text-xl font-bold tracking-wider text-green-500">TrackAid</div>
+          <div className="flex items-center gap-2.5">
+            <img src="/icon.svg" alt="TrackAid Logo" className="w-7 h-7" />
+            <div className="text-xl font-bold tracking-wider text-green-500">TrackAid</div>
+          </div>
           <div className="text-sm text-gray-400">The Philippine Resource Mobilization Tracker</div>
           <div className="mt-1 text-xs text-cyan-500/90">{FOCUS_REGION_LABEL}</div>
         </div>
@@ -151,7 +154,6 @@ export default async function Dashboard() {
               <thead className="text-[10px] font-bold tracking-widest text-gray-500 uppercase bg-black/20">
                 <tr>
                   <th className="px-4 py-3 border-b border-gray-800">Province</th>
-                  <th className="px-4 py-3 border-b border-gray-800">Region</th>
                   <th className="px-4 py-3 border-b border-gray-800">Poverty Incidence</th>
                   <th className="px-4 py-3 border-b border-gray-800">International Aid</th>
                   <th className="px-4 py-3 border-b border-gray-800">Budget Coverage</th>
@@ -164,7 +166,6 @@ export default async function Dashboard() {
                     <td className="px-4 py-3 font-medium">
                       <ProvinceMapLink name={p.name}>{p.name}</ProvinceMapLink>
                     </td>
-                    <td className="px-4 py-3">{p.region}</td>
                     <td className="px-4 py-3">{p.incidence}%</td>
                     <td className="px-4 py-3">₱ {(p.aid / 1000000).toFixed(1)}M</td>
                     <td className={`px-4 py-3 font-mono font-semibold ${p.tier.textClass}`}>
